@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+import { signUp } from '@/lib/auth-client';
+
 import {
   Card,
   CardContent,
@@ -12,10 +15,11 @@ import {
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { Spinner } from '@/components/ui/spinner';
+import { useRouter } from 'next/navigation';
 
 export default function SignUpForm() {
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState('');
@@ -24,13 +28,19 @@ export default function SignUpForm() {
 
   async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
+    setError('');
     setIsSubmitting(true);
-    setError(null);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log('Signing up with:', { name, email, password });
+      const result = await signUp.email({ name, email, password });
+
+      if (result.error) {
+        setError(
+          'Failed to sign up. Check to make sure all fields are filled out.'
+        );
+      } else {
+        router.push('/dashboard');
+      }
     } catch (err) {
       setError('Failed to sign up. Please try again.');
     } finally {
@@ -46,6 +56,11 @@ export default function SignUpForm() {
       </CardHeader>
       <form className='space-y-5' onSubmit={handleSubmit}>
         <CardContent className='space-y-4'>
+          {error && (
+            <div className='text-sm text-destructive bg-destructive/15 p-2 rounded-md'>
+              {error}
+            </div>
+          )}
           <div className='space-y-2'>
             <Label htmlFor='name' className='text-sm'>
               Name
@@ -96,7 +111,7 @@ export default function SignUpForm() {
             {isSubmitting ? (
               <>
                 <Spinner className='size-5 animate-spin' />
-                Signing Up...
+                Creating account...
               </>
             ) : (
               'Sign Up'
