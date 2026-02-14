@@ -121,5 +121,20 @@
   }
   body {
     @apply bg-background text-foreground;
+    scrollbar-gutter: stable both-edges;
+  }
+
+  /* Hide native vertical scrollbar visually but keep scrolling behavior */
+  html,
+  body {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  /* WebKit browsers (Chrome, Safari, Opera) */
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
   }
 }
