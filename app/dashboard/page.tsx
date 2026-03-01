@@ -14,7 +14,7 @@ export default async function DashboardPage() {
   const board = await Board.findOne({
     userId: session.user.id,
     name: 'My Board',
-  }).populate('columns');
+  }).populate({ path: 'columns', populate: { path: 'jobApplications' } });
 
   // Serialize board data to remove MongoDB ObjectIds and Dates with toJSON methods
   // creates a plain JS object

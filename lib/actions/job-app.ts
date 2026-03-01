@@ -1,6 +1,5 @@
 'use server';
 
-import { OrderedBulkOperation } from 'mongodb';
 import { getSession } from '../auth';
 import dbConnect from '../db';
 import { Board, Column, JobApplication } from '../models';
@@ -70,8 +69,6 @@ export async function createJobApplication(data: JobApplicationData) {
       .select('order')
       .lean()) as { order: number }) || null;
 
-  const order = maxOrder ? maxOrder.order + 1 : 0;
-
   // Create job application
   const jobApplication = await JobApplication.create({
     company,
@@ -81,10 +78,20 @@ export async function createJobApplication(data: JobApplicationData) {
     salary,
     jobUrl,
     columnId,
+    userId: session.user.id,
     boardId,
     tags: tags || [],
     description,
     status: 'applied',
     order: maxOrder ? maxOrder.order + 1 : 0,
   });
+
+  // Add job application to column
+  await Column.findByIdAndUpdate(columnId, {
+    $push: { jobApplications: jobApplication._id },
+  });
+
+  return {
+    data: JSON.parse(JSON.stringify(jobApplication)),
+  };
 }

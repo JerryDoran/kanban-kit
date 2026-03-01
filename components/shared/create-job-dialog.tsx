@@ -16,10 +16,22 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { createJobApplication } from '@/lib/actions/job-app';
 
 type CreateJobApplicationDialogProps = {
   columnId: string;
   boardId: string;
+};
+
+const INITIAL_FORM_DATA = {
+  company: '',
+  position: '',
+  location: '',
+  notes: '',
+  salary: '',
+  jobUrl: '',
+  tags: '',
+  description: '',
 };
 
 export default function CreateJobApplicationDialog({
@@ -42,8 +54,23 @@ export default function CreateJobApplicationDialog({
     e.preventDefault();
 
     try {
-      
-      toast.success('Job application created successfully.');
+      const result = await createJobApplication({
+        ...formData,
+        columnId,
+        boardId,
+        tags: formData.tags
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0),
+      });
+
+      if (!result.error) {
+        setFormData(INITIAL_FORM_DATA);
+        setOpen(false);
+        toast.success('Job application created successfully.');
+      } else {
+        toast.error(result.error);
+      }
     } catch (error) {
       console.error(error);
       toast.error('Failed to create job application.');
@@ -60,12 +87,12 @@ export default function CreateJobApplicationDialog({
           <Plus /> Add Job
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className='border border-zinc-600 bg-zinc-800/50 backdrop-blur-sm rounded-lg'>
         <DialogHeader>
           <DialogTitle>Create Job Application</DialogTitle>
           <DialogDescription>Track a new job application.</DialogDescription>
         </DialogHeader>
-        <form className='space-y-4' onSubmit={handleSubmit}>
+        <form className='space-y-4 rounded-md p-4' onSubmit={handleSubmit}>
           <div className='space-y-4'>
             <div className='grid grid-cols-2 gap-4'>
               <div className='space-y-2'>
