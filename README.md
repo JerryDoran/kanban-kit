@@ -19,3 +19,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## Notes
 
 - Using MongoDB as database
+- "seed:db": "tsx --env-file=.env scripts/seed.ts"
