@@ -11,6 +11,12 @@ const db = client.db();
 // Use this function for server-side authentication
 export const auth = betterAuth({
   database: mongodbAdapter(db, { client }),
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 60, // 1 hour in seconds
+    },
+  },
   emailAndPassword: {
     enabled: true,
   },

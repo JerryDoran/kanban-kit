@@ -22,7 +22,7 @@ export default function JobApplicationCard({
   return (
     <>
       <Card className='transition border border-zinc-700/80'>
-        <CardContent className='p-4'>
+        <CardContent className='px-4'>
           <div className='flex justify-between items-start'>
             <div className='flex-1'>
               <h3 className='text-lg font-semibold'>{job.company}</h3>
@@ -49,7 +49,7 @@ export default function JobApplicationCard({
                   href={job.jobUrl}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='mt-2 text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1'
+                  className='mt-4 text-sm text-blue-400 hover:text-blue-300 inline-flex items-center gap-1'
                   onClick={(e) => e.stopPropagation()}
                 >
                   <ExternalLink className='size-4 inline-block' /> View Job
