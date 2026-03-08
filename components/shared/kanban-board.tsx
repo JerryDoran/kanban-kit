@@ -1,5 +1,6 @@
 'use client';
 
+import { useBoard } from '@/lib/hooks/use-boards';
 import { Column, Board, JobApplication } from '@/lib/models/models.types';
 import {
   Award,
@@ -10,7 +11,6 @@ import {
   Trash2,
   XCircle,
 } from 'lucide-react';
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
@@ -129,7 +129,8 @@ function SortableJobCard({
 }
 
 export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
-  const columns = board.columns;
+  
+  const {columns, moveJob} = useBoard(board);
 
   const sortedColumns = columns?.sort((a, b) => a.order - b.order) || [];
 
