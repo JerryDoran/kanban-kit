@@ -152,7 +152,7 @@ export async function updateJobApplication(
     newColumnId && newColumnId !== currentColumnId;
 
   if (isMovingToDifferentColumn) {
-    await Column.findByIdAndUpdate(newColumnId, {
+    await Column.findByIdAndUpdate(currentColumnId, {
       $pull: { jobApplications: id },
     });
 
@@ -176,8 +176,8 @@ export async function updateJobApplication(
         });
       }
     } else {
-      if (targetColumn.length < 0) {
-        const lastJobOrder = targetColumn[targetColumn.length - 1]?.order || 0;
+      if (targetColumn.length > 0) {
+        const lastJobOrder = targetColumn[targetColumn.length - 1].order || 0;
         newOrder = lastJobOrder + 100;
       } else {
         newOrder = 0;
@@ -234,7 +234,39 @@ export async function updateJobApplication(
     new: true,
   });
 
+  revalidatePath('/dashboard');
+
   return {
     data: JSON.parse(JSON.stringify(updated)),
+  };
+}
+
+export async function deleteJobApplication(id: string) {
+  const session = await getSession();
+
+  if (!session?.user) {
+    return {
+      error: 'Unauthorized',
+    };
+  }
+
+  const jobApplication = await JobApplication.findById(id);
+
+  if (!jobApplication || jobApplication.userId.toString() !== session.user.id) {
+    return {
+      error: 'Job application not found!',
+    };
+  }
+
+  await Column.findByIdAndUpdate(jobApplication.columnId, {
+    $pull: { jobApplications: id }, // Remove the job application from the column
+  });
+
+  await JobApplication.deleteOne({ _id: id }); // Delete the job application from the database
+
+  revalidatePath('/dashboard');
+
+  return {
+    success: true,
   };
 }
